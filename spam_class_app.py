@@ -13,13 +13,13 @@ import pickle
 st.write("""
 # **Spam Emails/Messages Classification Application**
 
-**Spam emails**, also referred to as junk email, spam mail, or simply spam, refers to unwanted/unrequested messages sent in bulk via email. 
+[Refered from Wikipedia]Spam emails, also referred to as junk email, spam mail, or simply spam, refers to unwanted/unrequested messages sent in bulk via email. The term originates from a Monty Python sketch, where the name of a canned meat product, "Spam," is used repetitively, mirroring the intrusive nature of unwanted emails.
+Spam is primarily a financial burden for the recipient, who may be required to manage, filter, or delete these unwanted messages. Since the expense of spam is mostly borne by the recipient,[4] it is effectively a form of "postage due" advertising,[5] where the recipient bears the cost of unsolicited messages. This cost imposed 
+on recipients, without compensation from the sender, makes spam an example of a "negative externality" (a side effect of an activity that affects others who are not involved in the decision).
 Most email spam messages are commercial in nature. Whether commercial or not, many are not only annoying as a form of attention theft, but also dangerous because they may contain links that lead to phishing web sites or sites that are hosting malware or include malware as file attachments.
 
 In many cases, the recipients are failing in classifying the SPAM and essential mails leading to them financial loss or legal consequences. 
-And **this application is a solution** for the same. 
-
-If you have received any such and need to know the authenticity, simply copy and paste that message in the text box provided in the left sidebar and the status will be displayed below[predition section] in a couple of minutes.
+And this application is a solution for the same. They can simply copy and paste the message received in the text box provided in the left sidebar and wait for the output- Spam or not predicted below.
 
 """)
 
@@ -30,8 +30,7 @@ text= st.sidebar.text_input('Type or paste the message here',
               disabled= False, placeholder=None)
 
 
-st.write("""
-    ### **The input text message for verifying the authenticity is below**""")
+st.write('The input text message for verifying the authenticity is below')
 st.write(text)
 
 data= pd.DataFrame.from_dict({'Message': [text]})
@@ -40,7 +39,7 @@ data= pd.DataFrame.from_dict({'Message': [text]})
                  
 # **Model Building**
 #Read the csv file.
-df = pd.read_csv('https://github.com/anishnair3091/spam_email_clsfctn/raw/refs/heads/main/Spam.csv',skiprows=1, header=0)
+df = pd.read_csv(r'/Users/anishmnair/Desktop/Spam.csv',skiprows=1, header=0)
 
 #Drop the rows with missing/NaN values
 df.dropna(axis=1, inplace=True)
@@ -51,13 +50,11 @@ encoder.fit(df['Category'])
 df['label']= encoder.transform(df['Category'])
 
 #Tokenization
-tokenizer = torch.hub.load('huggingface/pytorch-transformers', 'tokenizer', 'bert-base-uncased')    # Download vocabulary from S3 and cache.
-tokenizer = torch.hub.load('huggingface/pytorch-transformers', 'tokenizer', './test/bert_saved_model/')  # E.g. tokenizer was saved using `save_pretrained('./test/saved_model/')`
+tokenizer= BertTokenizerFast.from_pretrained('bert-base-uncased')
 
 #Create Model
-model = torch.hub.load('huggingface/pytorch-transformers', 'modelForSequenceClassification', 'bert-base-uncased')    # Download model and configuration from S3 and cache.
-model = torch.hub.load('huggingface/pytorch-transformers', 'modelForSequenceClassification', './test/bert_model/')  # E.g. model was saved using `save_pretrained('./test/saved_model/')`
-model = torch.hub.load('huggingface/pytorch-transformers', 'modelForSequenceClassification', 'bert-base-uncased', output_attention=True)
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels= 2)
+
 #Prepare train, eval and test datasets
 train_df = df.sample(200, random_state= 42)
 eval_df = df.sample(200, random_state= 42)
@@ -118,7 +115,7 @@ for number in x:
 
 prediction= y
 
-category_type= np.array(['Spam', 'Not Spam'])
+category_type= np.array(['Not Spam', 'Spam'])
 
 predicted_output= category_type[prediction]
 
