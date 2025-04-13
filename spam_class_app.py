@@ -7,7 +7,7 @@ from datasets import Dataset
 import numpy as np
 import evaluate
 import streamlit as st
-import torch
+import torchserve
 import pickle
 
 st.write("""
