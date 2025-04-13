@@ -6,3 +6,4 @@ transformers==4.50.3
 evaluate==0.4.3
 datasets==3.5.0
 torchserve== 0.12.0
+
